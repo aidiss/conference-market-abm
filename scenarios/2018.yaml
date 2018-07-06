@@ -1,0 +1,36 @@
+version: 1
+start_date: 2018-01-01
+end_date: 2019-01-01
+agents:
+  persons:
+    count: 10
+
+  conferences:
+    - name: 'PyConLT'
+      start_date: 2018-05-05
+      end_date: 2018-05-05
+      price: 0
+      topics: [python, django, sklearn, keras, natural language processing, asyncio, gensim]
+
+    - name: 'DevOpsPro Vilnius'
+      start_date: 2019-03-14
+      end_date: 2019-03-14
+      price: 200
+      topics: [
+        DevOps Approach. Continuous Delivery, Continuous Integration, Configuration Management, Automated Testing and Deployment,
+        DevOps Real World Experience, Technology Adoption, Real Life Implementation Examples, Best Practices and Insights from the Field,
+        DevOps Tools Docker, Chef, Puppet, PowerShell, Kubernetes, GitHub, Ansible, SaltStack, Capistrano, Jenkins,
+        DevOps Technologies, Virtualization, Containerization, Orchestration, Microservices, Cloud Computing (Google Compute Engine, Azure, OpenStack),
+      ]
+
+    - name: 'TestCon'
+      start_date: 2018-10-16
+      end_date: 2018-10-18
+      price: 10
+      topics: [Test Management, Testing Techniques and Methodologies, Test Automation, Performance Testing, Testing the Internet of Things (IoT), Testing Metrics, Agile Testing, Test Team Leadership and Soft Skills.]
+
+    - name: 'DevDays Vilnius'
+      start_date: 2018-05-22
+      end_date: 2018-05-24
+      price: 200
+      topics: [programming languages, architecture and design, IoT, applied data science, agile and leadership, functional programming, machine learning, web and UX, bigdata and analytics, databases and warehouse, etc.] 

@@ -1,0 +1,47 @@
+JRuby
+Elixir
+Julia
+R
+C
+Haskell
+Perl
+Clojure
+COBOL
+Elm
+Dart
+Eta
+JavaScript
+CoffeeScript
+Common Lisp
+C++
+Markdown
+FStar
+PHP
+Kotlin
+F#
+C#
+Scala
+Visual Basic
+HAML
+Java
+Eve
+Groovy
+Swift
+Erlang
+Arc
+Imba
+MATLAB
+Rust
+Go
+Om
+Lua
+Scala Native
+ClojureScript
+ES6
+Jolie
+Crystal
+HTML5
+Objective-C
+D
+Hack
+Ruby

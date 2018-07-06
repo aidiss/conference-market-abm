@@ -1,0 +1,31 @@
+version: 1
+start_date: 2019-01-01
+end_date: 2020-01-01
+agents:
+  persons:
+    count: 10
+
+  conferences:
+    - name: 'PyConLT2019'
+      start_date: 2019-05-20
+      end_date: 
+      price: 10
+      topics: python django sklearn
+
+    - name: 'DevDaysPro Vilnius'
+      start_date: 2019-05-20
+      end_date: 
+      price: 200
+      topics: kubernetes ansible saltstack
+
+    - name: 'TestCon'
+      start_date: 2019-05-20
+      end_date: 
+      price: 200
+      topics: python django sklearn
+
+    - name: 'PyConLT2018'
+      start_date: 2019-05-20
+      end_date: 
+      price: 200
+      topics: python django sklearn

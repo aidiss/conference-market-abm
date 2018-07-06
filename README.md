@@ -1,0 +1,25 @@
+Conference Market ABM
+======================
+
+This agent-based model simulates conference market behaviour.
+
+There are two main actors in play:
+
+1. Persons interest in conference and its topics.
+2. Conferences, especially at the same time.
+
+Todo:
+
+- [ ] Calculate conference visibility from social media/networks.
+- [ ] Person to person interaction, invitations to conferences.
+
+To run use:
+
+```shell
+python run.py {scenario_name}
+```
+
+Available scenarios:
+
+- 2018
+- 2019
