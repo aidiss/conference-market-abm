@@ -1,18 +1,61 @@
-from random import choice, randint
 from datetime import datetime
+from random import choice, randint, random
 from typing import List
-from mesa import Agent, Model
-from fuzzywuzzy.fuzz import partial_token_set_ratio, token_set_ratio, ratio
 
-from conference_tickets.utils import load_techs, load_stackshare_techs
+import numpy as np
+from faker import Faker
+from faker.providers import BaseProvider
+from fuzzywuzzy.fuzz import partial_token_set_ratio, ratio, token_set_ratio
+from mesa import Agent, Model
+
+from conference_market.utils import load_stackshare_techs, load_techs
 
 techs = load_techs()
 techs = load_stackshare_techs()
 interest_modes = [partial_token_set_ratio, token_set_ratio, ratio]
 
+fake = Faker()
+
+
+
+class ConferenceProvider(BaseProvider):
+    conferences = ['one', 'two', 'three']
+
+    def conference(self):
+        return dict(
+            name=self.random_element(self.conferences),
+            wealth=self.wealth(),
+            start_date=self.start_date(),
+            end_date=self.start_date(),
+            price=self.price(),
+            visibility=self.visibility(),
+            topics=[self.topic() for _ in range(10)],
+        )
+
+    def wealth(self):
+        return self.random_digit()
+
+    def start_date(self):
+        return fake.date()
+
+    def end_date(self):
+        return fake.date()
+
+    def price(self):
+        return fake.date()
+
+    def visibility(self):
+        return self.random_int()
+
+    def topic(self):
+        return 'asd'
+
+
+fake.add_provider(ConferenceProvider)
+
 
 class Person(Agent):
-    def __init__(self, unique_id: int, model: Model):
+    def __init__(self, unique_id: int, model: Model, *args, **kwargs):
         super().__init__(unique_id, model)
         self.wealth = 500
         self.monthly_income = randint(300, 1500)
@@ -23,21 +66,32 @@ class Person(Agent):
         self.interests = [choice(techs) for x in range(interest_width)]
         self.interest_matching_mode = choice(interest_modes)
         self.is_employed = True
+        self.awareness = np.random.normal(0.5, 0.2)
+
+
+    @classmethod
+    def from_faker_profile(cls, unique_id, model):
+        return cls(unique_id, model, **fake.profile())
 
     def check_for_conferences(self):
         for conference in self.model.conferences:
 
-            # Cant consider too expensive conferences
-            if conference.price > self.wealth:
+            # Did person see the conference
+            if conference.visibility < self.awareness:
                 continue
 
             # Do not consider buying second ticket.
             if conference.name in self.tickets:
                 continue
 
+            # Cant consider too expensive conferences
+            if conference.price > self.wealth:
+                continue
+
+            # todo: move elsewhe.
             if conference.start_date < self.model.date:
-                # attend a conference
-                pass
+                # print('skipping', conference.start_date)
+                continue
 
             interest = self.calculate_interest_in_conference(conference)
             self.consider_buying_a_ticket(conference, interest)
@@ -45,10 +99,20 @@ class Person(Agent):
     def calculate_interest_in_conference(self, conference):
         interest = self.interest_matching_mode(
             conference.topics, self.interests)
+
+        # self.model.datacollector.add_table_row(
+        #     table_name='interest',
+        #     row={
+        #         'unique_id': self.unique_id,
+        #         'interest': interest,
+        #         'date': self.model.date
+        #     }
+        # )
         return interest
 
     def consider_buying_a_ticket(self, conference, interest):
-        if interest > 50:
+        # print(interest)
+        if interest > 45:
             self.wealth -= conference.price
             conference.wealth += conference.price
             self.tickets.append(conference.name)
@@ -57,10 +121,12 @@ class Person(Agent):
             self.model.datacollector.add_table_row(
                 table_name='Purchase',
                 row={
-                    'unique_id': self.unique_id, 
+                    'unique_id': self.unique_id,
                     'conference_name': conference.name,
                     'wealth': self.wealth,
-                    'date': self.model.date})
+                    'date': self.model.date
+                }
+            )
 
     def work(self):
         """Work requires certain skill, there are other people working there too."""
@@ -115,7 +181,6 @@ class Person(Agent):
         if self.model.date.day == 1:
             self.pay_taxes()
 
-
     def __repr__(self):
         return str(self.__class__.__name__) + str(self.__dict__)
 
@@ -130,8 +195,10 @@ class Conference:
             end_date: datetime,
             price: str,
             visibility: float,
-            topics: List[str]):
+            topics: List[str],
+            wealth: int):
         self.unique_id = unique_id
+        self.model = model
         self.name = name
         self.start_date = start_date
         self.end_date = end_date
@@ -141,17 +208,42 @@ class Conference:
         self.wealth = 500
         self.ticket_sold_count = 0
 
+    @classmethod
+    def from_faker_conference(cls, unique_id, model, **kwargs):
+        return cls(unique_id, model, **fake.conference())
+
     def __repr__(self):
         return str(self.__class__.__name__) + str(self.__dict__)
 
-    def increate_visibility(self):
-        self.visibility *= 1.2
+    def advertise(self):
+        r = .01  # growth rate / tick
+        K = 1  # carrying capacity
+        t = 400  # number of ticks
+
+        l = []
+        x = self.visibility
+        x = x+r*x*(1-x/K)
+        self.visibility = x
+ 
+
+    def dump_report(self):
+        self.model.datacollector.add_table_row(
+            table_name='conferences',
+            row={
+                'unique_id': self.unique_id,
+                'name': self.name,
+                'ticket_sold_count': self.ticket_sold_count,
+                'date':self.model.date
+            }
+        )
 
     def step(self):
         # Advertise
         # Sign a speaker
         # Publish tickets
-        pass
+        # Increase visibility
+        self.advertise()
+        self.dump_report()
 
 
 class Economy(Agent):

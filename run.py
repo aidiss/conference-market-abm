@@ -1,7 +1,7 @@
 import argparse
 
-from conference_tickets.model import ConferenceModel
-from conference_tickets.utils import load_yaml_scenario
+from conference_market.model import ConferenceModel
+from conference_market.utils import load_yaml_scenario
 
 
 def create_argument_parser():
@@ -18,7 +18,7 @@ def run():
     scenario = load_yaml_scenario(scenario_name)
 
     m = ConferenceModel(scenario=scenario)
-    m.run(steps=10)
+    m.run()
 
 
 if __name__ == '__main__':
