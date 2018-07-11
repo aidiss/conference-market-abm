@@ -13,6 +13,7 @@ agents:
       topics: [python, django, sklearn, keras, natural language processing, asyncio, gensim]
       wealth: 1000
       visibility: 0.3
+      city: kaunas
 
     - name: 'DevOpsPro Vilnius'
       start_date: 2019-03-14
@@ -26,6 +27,7 @@ agents:
       ]
       wealth: 1000
       visibility: 0.4
+      city: vilnius
 
 
     - name: 'TestCon'
@@ -35,6 +37,7 @@ agents:
       topics: [Test Management, Testing Techniques and Methodologies, Test Automation, Performance Testing, Testing the Internet of Things (IoT), Testing Metrics, Agile Testing, Test Team Leadership and Soft Skills.]
       wealth: 1000
       visibility: 0.3
+      city: vilnius
 
     - name: 'DevDays Vilnius'
       start_date: 2018-05-22
@@ -43,3 +46,4 @@ agents:
       topics: [programming languages, architecture and design, IoT, applied data science, agile and leadership, functional programming, machine learning, web and UX, bigdata and analytics, databases and warehouse, etc.] 
       wealth: 1000
       visibility: 0.3
+      city: vilnius

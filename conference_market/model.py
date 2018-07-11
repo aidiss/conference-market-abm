@@ -36,6 +36,7 @@ class ConferenceModel(Model):
         economy = Economy(9999, self)
         self.schedule.add(economy)
         self.economy = economy
+        self.location_map = {('kaunas', 'vilnius'): 100, ('vilnius', 'kaunas'): 120}
 
         for i in range(person_count):
             person = Person.from_faker_profile(i, self)
@@ -49,11 +50,9 @@ class ConferenceModel(Model):
         # conference = Conference.from_faker_conference(i, self)
         self.schedule.add(conference)
 
-
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
-
 
     def __repr__(self):
         return str(self.__class__.__name__)
@@ -68,9 +67,12 @@ class ConferenceModel(Model):
         table_vars_df = self.datacollector.get_table_dataframe('Purchase')
         print(self.datacollector.get_table_dataframe('Purchase'))
         print(self.datacollector.get_table_dataframe('conferences'))
-        self.datacollector.get_table_dataframe('interest').to_html('reports/interest.html')
-        self.datacollector.get_table_dataframe('interest').to_pickle('reports/interest.p')
-        self.datacollector.get_table_dataframe('conferences').to_pickle('reports/conferences.p')
+        self.datacollector.get_table_dataframe(
+            'interest').to_html('reports/interest.html')
+        self.datacollector.get_table_dataframe(
+            'interest').to_pickle('reports/interest.p')
+        self.datacollector.get_table_dataframe(
+            'conferences').to_pickle('reports/conferences.p')
         agent_vars_df.unstack()['wealth'].plot()
         plt.savefig('reports/image.png')
 
@@ -81,7 +83,6 @@ class ConferenceModel(Model):
         model_vars_df.to_html(model_report_path)
         model_vars_report_path = 'reports/purchase_vars.html'
         table_vars_df.to_html(model_vars_report_path)
-
 
     def run(self):
         logger.info('Loading conferences!')
