@@ -17,7 +17,6 @@ interest_modes = [partial_token_set_ratio, token_set_ratio, ratio]
 fake = Faker()
 
 
-
 class ConferenceProvider(BaseProvider):
     conferences = ['one', 'two', 'three']
 
@@ -67,7 +66,7 @@ class Person(Agent):
         self.interest_matching_mode = choice(interest_modes)
         self.is_employed = True
         self.awareness = np.random.normal(0.5, 0.2)
-
+        self.city = choice(['kaunas', 'vilnius', 'vilnius'])
 
     @classmethod
     def from_faker_profile(cls, unique_id, model):
@@ -88,13 +87,20 @@ class Person(Agent):
             if conference.price > self.wealth:
                 continue
 
-            # todo: move elsewhe.
+            # todo: move elsewhere
             if conference.start_date < self.model.date:
-                # print('skipping', conference.start_date)
                 continue
 
+            if conference.city == self.city:
+                distance_penalty = 0
+            else:
+                distance = self.model.location_map[(
+                    self.city, conference.city)]
+                distance_penalty = distance
+
             interest = self.calculate_interest_in_conference(conference)
-            self.consider_buying_a_ticket(conference, interest)
+            self.consider_buying_a_ticket(
+                conference, interest, distance_penalty)
 
     def calculate_interest_in_conference(self, conference):
         interest = self.interest_matching_mode(
@@ -110,8 +116,9 @@ class Person(Agent):
         # )
         return interest
 
-    def consider_buying_a_ticket(self, conference, interest):
-        # print(interest)
+    def consider_buying_a_ticket(self, conference, interest, distance_penalty):
+        interest -= distance_penalty / 10
+
         if interest > 45:
             self.wealth -= conference.price
             conference.wealth += conference.price
@@ -196,7 +203,8 @@ class Conference:
             price: str,
             visibility: float,
             topics: List[str],
-            wealth: int):
+            wealth: int,
+            city: str):
         self.unique_id = unique_id
         self.model = model
         self.name = name
@@ -207,6 +215,7 @@ class Conference:
         self.topics = topics
         self.wealth = 500
         self.ticket_sold_count = 0
+        self.city = city
 
     @classmethod
     def from_faker_conference(cls, unique_id, model, **kwargs):
@@ -218,13 +227,9 @@ class Conference:
     def advertise(self):
         r = .01  # growth rate / tick
         K = 1  # carrying capacity
-        t = 400  # number of ticks
-
-        l = []
         x = self.visibility
         x = x+r*x*(1-x/K)
         self.visibility = x
- 
 
     def dump_report(self):
         self.model.datacollector.add_table_row(
@@ -233,7 +238,7 @@ class Conference:
                 'unique_id': self.unique_id,
                 'name': self.name,
                 'ticket_sold_count': self.ticket_sold_count,
-                'date':self.model.date
+                'date': self.model.date
             }
         )
 
