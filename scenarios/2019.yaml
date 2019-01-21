@@ -11,21 +11,33 @@ agents:
       end_date: 
       price: 10
       topics: python django sklearn
+      wealth: 1000
+      visibility: 0.3
+      city: kaunas
 
     - name: 'DevDaysPro Vilnius'
       start_date: 2019-05-20
       end_date: 
       price: 200
       topics: kubernetes ansible saltstack
+      wealth: 1000
+      visibility: 0.3
+      city: vilnius
 
     - name: 'TestCon'
       start_date: 2019-05-20
       end_date: 
       price: 200
       topics: python django sklearn
+      wealth: 1000
+      visibility: 0.3
+      city: vilnius
 
     - name: 'PyConLT2018'
       start_date: 2019-05-20
       end_date: 
       price: 200
       topics: python django sklearn
+      wealth: 1000
+      visibility: 0.3
+      city: kaunas

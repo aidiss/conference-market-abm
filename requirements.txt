@@ -1,2 +1,4 @@
 mesa
 pandas
+fuzzywuzzy
+python-Levenshtein

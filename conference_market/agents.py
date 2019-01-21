@@ -18,7 +18,7 @@ fake = Faker()
 
 
 class ConferenceProvider(BaseProvider):
-    conferences = ['one', 'two', 'three']
+    conferences = ["one", "two", "three"]
 
     def conference(self):
         return dict(
@@ -47,7 +47,7 @@ class ConferenceProvider(BaseProvider):
         return self.random_int()
 
     def topic(self):
-        return 'asd'
+        return "asd"
 
 
 fake.add_provider(ConferenceProvider)
@@ -66,7 +66,7 @@ class Person(Agent):
         self.interest_matching_mode = choice(interest_modes)
         self.is_employed = True
         self.awareness = np.random.normal(0.5, 0.2)
-        self.city = choice(['kaunas', 'vilnius', 'vilnius'])
+        self.city = choice(["kaunas", "vilnius", "vilnius"])
 
     @classmethod
     def from_faker_profile(cls, unique_id, model):
@@ -94,17 +94,14 @@ class Person(Agent):
             if conference.city == self.city:
                 distance_penalty = 0
             else:
-                distance = self.model.location_map[(
-                    self.city, conference.city)]
+                distance = self.model.location_map[(self.city, conference.city)]
                 distance_penalty = distance
 
             interest = self.calculate_interest_in_conference(conference)
-            self.consider_buying_a_ticket(
-                conference, interest, distance_penalty)
+            self.consider_buying_a_ticket(conference, interest, distance_penalty)
 
     def calculate_interest_in_conference(self, conference):
-        interest = self.interest_matching_mode(
-            conference.topics, self.interests)
+        interest = self.interest_matching_mode(conference.topics, self.interests)
 
         # self.model.datacollector.add_table_row(
         #     table_name='interest',
@@ -126,13 +123,13 @@ class Person(Agent):
             conference.ticket_sold_count += 1
 
             self.model.datacollector.add_table_row(
-                table_name='Purchase',
+                table_name="Purchase",
                 row={
-                    'unique_id': self.unique_id,
-                    'conference_name': conference.name,
-                    'wealth': self.wealth,
-                    'date': self.model.date
-                }
+                    "unique_id": self.unique_id,
+                    "conference_name": conference.name,
+                    "wealth": self.wealth,
+                    "date": self.model.date,
+                },
             )
 
     def work(self):
@@ -172,7 +169,8 @@ class Person(Agent):
             self.work()
             if self.model.date.day == 10:
                 self.collect_monthly_wage(
-                    source=self.model.economy, amount=self.monthly_income)
+                    source=self.model.economy, amount=self.monthly_income
+                )
         else:
             self.look_for_job()
 
@@ -194,17 +192,18 @@ class Person(Agent):
 
 class Conference:
     def __init__(
-            self,
-            unique_id: int,
-            model: Model,
-            name: str,
-            start_date: datetime,
-            end_date: datetime,
-            price: str,
-            visibility: float,
-            topics: List[str],
-            wealth: int,
-            city: str):
+        self,
+        unique_id: int,
+        model: Model,
+        name: str,
+        start_date: datetime,
+        end_date: datetime,
+        price: str,
+        visibility: float,
+        topics: List[str],
+        wealth: int,
+        city: str,
+    ):
         self.unique_id = unique_id
         self.model = model
         self.name = name
@@ -225,21 +224,21 @@ class Conference:
         return str(self.__class__.__name__) + str(self.__dict__)
 
     def advertise(self):
-        r = .01  # growth rate / tick
+        r = 0.01  # growth rate / tick
         K = 1  # carrying capacity
         x = self.visibility
-        x = x+r*x*(1-x/K)
+        x = x + r * x * (1 - x / K)
         self.visibility = x
 
     def dump_report(self):
         self.model.datacollector.add_table_row(
-            table_name='conferences',
+            table_name="conferences",
             row={
-                'unique_id': self.unique_id,
-                'name': self.name,
-                'ticket_sold_count': self.ticket_sold_count,
-                'date': self.model.date
-            }
+                "unique_id": self.unique_id,
+                "name": self.name,
+                "ticket_sold_count": self.ticket_sold_count,
+                "date": self.model.date,
+            },
         )
 
     def step(self):
@@ -252,6 +251,7 @@ class Conference:
 
 
 class Economy(Agent):
-    def __init__(self, unique_id, agent):
+    def __init__(self, unique_id, model, agent):
         self.unique_id = unique_id
+        self.model = model
         self.wealth = 100000

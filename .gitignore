@@ -4,3 +4,4 @@
 *.png
 notebooks/
 reports/
+__pycache__/

@@ -6,7 +6,7 @@ from conference_market.utils import load_yaml_scenario
 
 def create_argument_parser():
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument('-s', '--scenario', required=True)
+    argument_parser.add_argument("-s", "--scenario", required=True)
     return argument_parser
 
 
@@ -21,5 +21,5 @@ def run():
     m.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
