@@ -10,6 +10,9 @@ from mesa import Agent, Model
 
 from conference_market.utils import load_stackshare_techs, load_techs
 
+REPORTING = False
+
+
 techs = load_techs()
 techs = load_stackshare_techs()
 interest_modes = [partial_token_set_ratio, token_set_ratio, ratio]
@@ -90,14 +93,7 @@ class Person(Agent):
         if conference.start_date < self.model.date:
             return
 
-        # Calculate distance penalty
-        if conference.city == self.city:
-            distance_penalty = 0
-        else:
-            distance = self.model.location_map[(
-                self.city, conference.city)]
-            distance_penalty = distance
-        return distance_penalty
+        return True
 
     def check_for_conferences(self):
         """Looks through all conferences. Calls `consider_buyingticket`"""
@@ -107,16 +103,30 @@ class Person(Agent):
             return
 
         for conference in self.model.conferences:
-            distance_penalty = self.assess_conference(conference)
+            if not self.assess_conference(conference):
+                continue
+
+            # Calculate distance penalty
+            if conference.city == self.city:
+                distance_penalty = 0
+            else:
+                distance = self.model.location_map[(
+                    self.city, conference.city)]
+                distance_penalty = distance
+
             interest = self.calculate_interest_in_conference(conference)
-            self.consider_buying_a_ticket(conference, interest, distance_penalty)
+            self.consider_buying_a_ticket(
+                conference, interest, distance_penalty)
 
     def calculate_interest_in_conference(self, conference):
         """Calculates interest in conference based on how much topics fit"""
+
+        # Very slow. Todo: need to replace with faster approach
         interest = self.interest_matching_mode(
             conference.topics, self.interests)
 
-        self._report_interest(interest)
+        if REPORTING:
+            self._report_interest(interest)
         return interest
 
     def consider_buying_a_ticket(self, conference, interest: int, distance_penalty: float):
@@ -128,7 +138,8 @@ class Person(Agent):
         conference.wealth += conference.price
         self.tickets.append(conference.name)
         conference.ticket_sold_count += 1
-        self._report_purchase(conference)
+        if REPORTING:
+            self._report_purchase(conference)
 
     def work(self):
         """Work requires certain skill, there are other people working there too."""
@@ -306,8 +317,8 @@ class Conference:
         self.publish_cfp()
         self.advertise()
         self.publish_tickets()
-
-        self.dump_report()
+        if REPORTING:
+            self.dump_report()
 
     def dump_report(self):
         self.model.datacollector.add_table_row(

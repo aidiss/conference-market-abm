@@ -12,6 +12,7 @@ from conference_market.agents import Conference, Economy, Person
 from conference_market.datacollector import datacollector
 from conference_market.utils import daterange, timeit
 
+REPORTING = False
 
 @timeit
 def create_logger():
@@ -48,7 +49,7 @@ class ConferenceModel(Model):
             conference = Conference(i, self, **c)
             self.schedule.add(conference)
             # For agents to reach conference in easier way. Todo: should not be reached directly
-            self.conferences.append(conference) 
+            self.conferences.append(conference)   
 
         # conference = Conference.from_faker_conference(i, self)
         self.schedule.add(conference)
@@ -97,7 +98,6 @@ class ConferenceModel(Model):
         purchases.to_html("purchase_vars.html")
         agent_vars_df.to_html("agent_vars.html")
         model_vars_df.to_html("model_vars.html")
-
 
     def run(self):
         logger.info("Loading conferences!")
