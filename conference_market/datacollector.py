@@ -9,7 +9,7 @@ datacollector = DataCollector(
     },
     agent_reporters={"wealth": lambda a: a.wealth},
     tables={
-        "Purchase": ["unique_id", "wealth", "conference_name", "date"],
+        "purchase": ["unique_id", "wealth", "conference_name", "date"],
         "interest": ["unique_id", "interest", "date"],
         "conferences": ["unique_id", "name", "ticket_sold_count", "date"],
     },

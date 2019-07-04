@@ -47,7 +47,8 @@ class ConferenceModel(Model):
         for i, c in enumerate(conferences):
             conference = Conference(i, self, **c)
             self.schedule.add(conference)
-            self.conferences.append(conference)
+            # For agents to reach conference in easier way. Todo: should not be reached directly
+            self.conferences.append(conference) 
 
         # conference = Conference.from_faker_conference(i, self)
         self.schedule.add(conference)
@@ -70,27 +71,33 @@ class ConferenceModel(Model):
 
         dc = self.datacollector
 
-        agent_vars_df = dc.get_agent_vars_dataframe()
+        # Model reporter
         model_vars_df = dc.get_model_vars_dataframe()
-        table_vars_df = dc.get_table_dataframe("Purchase")
 
-        interests = dc.get_table_dataframe("interest")
-        interests.to_html("interest.html")
-        interests.to_pickle("interest.p")
+        # Agent reporter
+        agent_vars_df = dc.get_agent_vars_dataframe()
 
+        # Tables
         conferences = dc.get_table_dataframe("conferences")
-        conferences.to_pickle("conferences.p")
+        purchases = dc.get_table_dataframe("purchase")
+        interests = dc.get_table_dataframe("interest")
 
+        # Dumping
+        logger.info("Dumping reports!")
         agent_vars_df.unstack()["wealth"].plot()
         plt.savefig("image.png")
 
-        logger.info("Dumping reports!")
-        agents_report_path = "agent_vars.html"
-        agent_vars_df.to_html(agents_report_path)
-        model_report_path = "model_vars.html"
-        model_vars_df.to_html(model_report_path)
-        model_vars_report_path = "purchase_vars.html"
-        table_vars_df.to_html(model_vars_report_path)
+        # Pickle
+        conferences.to_pickle("conferences.p")
+        purchases.to_pickle("purchase.p")
+        interests.to_pickle("interest.p")
+
+        # Html
+        interests.to_html("interest.html")
+        purchases.to_html("purchase_vars.html")
+        agent_vars_df.to_html("agent_vars.html")
+        model_vars_df.to_html("model_vars.html")
+
 
     def run(self):
         logger.info("Loading conferences!")
