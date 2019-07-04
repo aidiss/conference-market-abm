@@ -70,9 +70,11 @@ class Person(Agent):
 
     @classmethod
     def from_faker_profile(cls, unique_id, model):
+        """Generates a person from faker profile"""
         return cls(unique_id, model, **fake.profile())
 
     def check_for_conferences(self):
+        """Looks through all conferences. Calls `consider_buyingticket`"""
         for conference in self.model.conferences:
 
             # Did person see the conference
@@ -91,17 +93,22 @@ class Person(Agent):
             if conference.start_date < self.model.date:
                 continue
 
+            # Calculate distance penalty
             if conference.city == self.city:
                 distance_penalty = 0
             else:
-                distance = self.model.location_map[(self.city, conference.city)]
+                distance = self.model.location_map[(
+                    self.city, conference.city)]
                 distance_penalty = distance
 
             interest = self.calculate_interest_in_conference(conference)
-            self.consider_buying_a_ticket(conference, interest, distance_penalty)
+            self.consider_buying_a_ticket(
+                conference, interest, distance_penalty)
 
     def calculate_interest_in_conference(self, conference):
-        interest = self.interest_matching_mode(conference.topics, self.interests)
+        """Calculates interest in conference based on how much topics fit"""
+        interest = self.interest_matching_mode(
+            conference.topics, self.interests)
 
         # self.model.datacollector.add_table_row(
         #     table_name='interest',
@@ -113,7 +120,7 @@ class Person(Agent):
         # )
         return interest
 
-    def consider_buying_a_ticket(self, conference, interest, distance_penalty):
+    def consider_buying_a_ticket(self, conference, interest:int, distance_penalty:float):
         interest -= distance_penalty / 10
 
         if interest > 45:
@@ -144,6 +151,9 @@ class Person(Agent):
             self.is_employed = True
 
     def collect_monthly_wage(self, source, amount):
+        """Collects monthly wage
+        
+        Todo: wage should be transfered to bank by employee"""
         self.wealth += amount
         source.wealth -= amount
 
