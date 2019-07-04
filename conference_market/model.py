@@ -16,8 +16,14 @@ REPORTING = False
 
 @timeit
 def create_logger():
-    logging.basicConfig(level="INFO")
-    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[
+            logging.FileHandler("log.log"),
+            logging.StreamHandler()
+        ])
+    logger = logging.getLogger()
     return logger
 
 
@@ -99,6 +105,7 @@ class ConferenceModel(Model):
         agent_vars_df.to_html("agent_vars.html")
         model_vars_df.to_html("model_vars.html")
 
+    @timeit
     def run(self):
         logger.info("Loading conferences!")
         logger.info("Building model!")
