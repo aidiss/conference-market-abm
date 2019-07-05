@@ -32,6 +32,7 @@ class ConferenceProvider(BaseProvider):
             price=self.price(),
             visibility=self.visibility(),
             topics=[self.topic() for _ in range(10)],
+            city=self.city()
         )
 
     def wealth(self):
@@ -41,16 +42,21 @@ class ConferenceProvider(BaseProvider):
         return fake.date()
 
     def end_date(self):
-        return fake.date()
+        return self.start_date() + 1
 
     def price(self):
-        return fake.date()
+        return self.random_int(30, 200)
 
     def visibility(self):
         return self.random_int()
 
     def topic(self):
-        return "asd"
+        with open('conference_market/data/techs.txt') as f:
+            data = f.read()
+        return self.random_choices(data.split('\n'), length=1)[0]
+
+    def city(self):
+        self.random_choices({"Vilnius": .8, "Kaunas": .2})
 
 
 fake.add_provider(ConferenceProvider)
@@ -134,12 +140,7 @@ class Person(Agent):
         if interest < 45:
             return
 
-        self.wealth -= conference.price
-        conference.wealth += conference.price
-        self.tickets.append(conference.name)
-        conference.ticket_sold_count += 1
-        if REPORTING:
-            self._report_purchase(conference)
+        self.buy_conference_ticket(conference)
 
     def work(self):
         """Work requires certain skill, there are other people working there too."""
@@ -173,24 +174,30 @@ class Person(Agent):
         amount = self.monthly_income
 
         self.wealth += amount
-        self.model.economy.wealth -= amount
 
     def buy_food(self):
         expenses = self.daily_food_expenses
         self.wealth -= expenses
-        self.model.economy.wealth += expenses
 
     def pay_taxes(self):
         if self.model.date.day != 1:
             return
         taxes = self.monthly_taxes
         self.wealth -= taxes
-        self.model.economy.wealth -= taxes
 
     def attend_event(self):
         # If event is today, attend.
         # What will happen?
         pass
+
+    def buy_conference_ticket(self, conference):
+
+        self.wealth -= conference.price
+        conference.wealth += conference.price
+        self.tickets.append(conference.name)
+        conference.ticket_sold_count += 1
+        if REPORTING:
+            self._report_purchase(conference)
 
     def step(self):
         """Steps done in a day.
@@ -330,10 +337,3 @@ class Conference:
                 "date": self.model.date,
             },
         )
-
-
-class Economy(Agent):
-    def __init__(self, unique_id, model, agent):
-        self.unique_id = unique_id
-        self.model = model
-        self.wealth = 100000

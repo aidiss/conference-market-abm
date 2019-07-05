@@ -8,7 +8,7 @@ from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.time import RandomActivation, StagedActivation
 
-from conference_market.agents import Conference, Economy, Person
+from conference_market.agents import Conference, Person
 from conference_market.datacollector import datacollector
 from conference_market.utils import daterange, timeit
 
@@ -41,9 +41,6 @@ class ConferenceModel(Model):
 
     @timeit
     def build_scenario(self, person_count, conferences):
-        economy = Economy(9999, self, "nothing")
-        self.schedule.add(economy)
-        self.economy = economy
         self.location_map = {("kaunas", "vilnius"): 100,
                              ("vilnius", "kaunas"): 120}
 
@@ -55,7 +52,7 @@ class ConferenceModel(Model):
             conference = Conference(i, self, **c)
             self.schedule.add(conference)
             # For agents to reach conference in easier way. Todo: should not be reached directly
-            self.conferences.append(conference)   
+            self.conferences.append(conference)
 
         # conference = Conference.from_faker_conference(i, self)
         self.schedule.add(conference)

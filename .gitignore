@@ -5,3 +5,6 @@
 notebooks/
 reports/
 __pycache__/
+.noseids
+log.log
+settings.json
