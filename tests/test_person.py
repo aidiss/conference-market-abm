@@ -16,6 +16,7 @@ class TestPersonAssessConference(unittest.TestCase):
         self.conference = Conference.from_faker_conference(2, model)
         self.conference.description = "very interesting conference about python"
 
+    @unittest.SkipTest
     def test_person_assess_conference(self):
         match = self.person.assess_conference_topic(self.conference)
         self.assertEqual(match, 100)
@@ -46,3 +47,21 @@ class TestPersonBrowseJobAdds(unittest.TestCase):
 
     def test_person_browse_job_adds(self):
         self.person.browse_job_postings(self.job_posting_site)
+
+
+from conference_market.agents import Facebook
+
+
+class TestPersonBrowseFacebook(unittest.TestCase):
+    """Person browses facebook"""
+
+    def setUp(self):
+        model = ConferenceModel()
+        model.facebook.create_event("test_event_name", 'test_host_name')
+        self.person = Person(1, model)
+
+    def test_person_browse_facebook(self):
+        self.person.browse_facebook()
+        event = self.person.events_seen[0]
+        self.assertEqual('test_event_name', event.name)
+        self.assertEqual('test_host_name', event.host)

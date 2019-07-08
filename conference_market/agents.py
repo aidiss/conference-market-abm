@@ -161,6 +161,7 @@ class Person(Agent):
         self.is_employed = True
         self.awareness = np.random.normal(0.5, 0.2)
         self.city = choice(["kaunas", "vilnius", "vilnius"])
+        self.events_seen = []
 
     @classmethod
     def from_faker_profile(cls, unique_id, model, **kwargs):
@@ -292,7 +293,8 @@ class Person(Agent):
         pass
 
     def buy_conference_ticket(self, conference):
-        logging.debug("Person with interests %s is buying a ticket to %s", ','.join(self.interests), conference.name)
+        logging.debug("Person with interests %s is buying a ticket to %s", ','.join(
+            self.interests), conference.name)
         self.wealth -= conference.price
         conference.wealth += conference.price
         self.tickets.append(conference.name)
@@ -304,6 +306,11 @@ class Person(Agent):
         """By browsing a site you increase your interest in certain technologies"""
         for job_posting in job_posting_site.job_postings:
             job_posting.description
+
+    def browse_facebook(self):
+        """Browse facebook"""
+        for event in self.model.facebook.events:
+            self.events_seen.append(event)
 
     def step(self):
         """Steps done in a day.
@@ -321,7 +328,8 @@ class Person(Agent):
         self.look_for_job()
         # You need to pay taxes, all of them.
         self.pay_taxes()
-
+        # You need to check facebook
+        self.browse_facebook()
         # Here is outlier.
         self.check_for_conferences()
         # you have a ticket, why not attending?
@@ -359,6 +367,8 @@ class Facebook:
         self.unique_id = unique_id
         self.model = model
         self.events: List[FacebookEvent] = []
+        self.posts = []
+        self.advertisments = []
         # typing:
         self.event_advertisments: List[FacebookEventAdvertisment] = []
 

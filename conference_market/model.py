@@ -11,6 +11,7 @@ from mesa.time import RandomActivation, StagedActivation
 from conference_market.agents import Conference, Person
 from conference_market.datacollector import datacollector
 from conference_market.utils import daterange, timeit
+from conference_market.agents import Facebook
 
 REPORTING = False
 
@@ -38,6 +39,7 @@ class ConferenceModel(Model):
         # self.schedule = schedule or StagedActivation(self, stage_list=['step'], shuffle=True)
         self.datacollector = datacollector
         self.scenario = scenario
+        self.facebook = Facebook(1, self)
 
     @timeit
     def build_scenario(self, person_count, conferences):

@@ -5,7 +5,6 @@ import time
 import logging
 
 
-
 def load_techs():
     with open("conference_market/data/techs.txt") as f:
         techs = f.read().split("\n")

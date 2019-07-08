@@ -12,6 +12,7 @@ class FacebookEvent:
         end_datetime: datetime.datetime = None,
     ):
         self.name = name
+        self.host = host
         self.description = description or ''
         self.attending = []
         self.admins = []
