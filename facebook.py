@@ -7,12 +7,14 @@ class FacebookEvent:
         self,
         name: str,
         host,
+        conference,
         description: str = None,
         start_datetime: datetime.datetime = None,
         end_datetime: datetime.datetime = None,
     ):
         self.name = name
         self.host = host
+        self.conference = conference
         self.description = description or ''
         self.attending = []
         self.admins = []

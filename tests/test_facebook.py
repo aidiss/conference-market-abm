@@ -23,9 +23,11 @@ class TestFacebookCreateEvent(unittest.TestCase):
         model = ConferenceModel()
         self.facebook = Facebook(1, model)
         self.person = Person(2, model)
+        self.conference = Conference.from_faker_conference(3, model)
 
     def test_facebook_create_event(self):
-        self.facebook.create_event(name="PyConLT 2020", host=self)
+        self.facebook.create_event(
+            name="PyConLT 2020", host=self, conference=self.conference)
         created_event = self.facebook.events[0]
         self.assertIsInstance(created_event, FacebookEvent)
         self.assertEqual(created_event.name, "PyConLT 2020")

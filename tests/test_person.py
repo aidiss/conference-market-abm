@@ -56,7 +56,9 @@ class TestPersonBrowseFacebook(unittest.TestCase):
 
     def setUp(self):
         model = ConferenceModel()
-        model.facebook.create_event("test_event_name", 'test_host_name')
+        conference = Conference.from_faker_conference(1, model)
+        model.facebook.create_event(
+            "test_event_name", 'test_host_name', conference)
         self.person = Person(1, model)
 
     def test_person_browse_facebook(self):
@@ -64,3 +66,19 @@ class TestPersonBrowseFacebook(unittest.TestCase):
         event = self.person.events_seen[0]
         self.assertEqual('test_event_name', event.name)
         self.assertEqual('test_host_name', event.host)
+
+
+class TestAssessSeenFacebookEvents(unittest.TestCase):
+    """Person browses facebook"""
+
+    def setUp(self):
+        model = ConferenceModel()
+        conference = Conference.from_faker_conference(1, model)
+        model.facebook.create_event(
+            "test_event_name", 'test_host_name', conference)
+        self.person = Person(1, model)
+
+    def test_person_browse_facebook(self):
+        self.person.browse_facebook()
+        self.person.assess_seen_events()
+        self.assertEqual(self.person.tickets, [])

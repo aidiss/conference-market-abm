@@ -203,6 +203,12 @@ class Person(Agent):
 
         return True
 
+    def assess_seen_events(self):
+        # Did person see the conference
+        for event in self.events_seen:
+            conference = event.conference
+            self.buy_conference_ticket(conference)
+
     def check_for_conferences(self):
         """Looks through all conferences. Calls `consider_buyingticket`"""
 
@@ -372,11 +378,12 @@ class Facebook:
         # typing:
         self.event_advertisments: List[FacebookEventAdvertisment] = []
 
-    def create_event(self, name, host):
+    def create_event(self, name, host, conference):
         """Create an event that can be like and participated by Facebook Users
 
         Consider: done by user?"""
-        facebook_event = FacebookEvent(name=name, host=host)
+        facebook_event = FacebookEvent(
+            name=name, host=host, conference=conference)
         self.events.append(facebook_event)
 
     def create_event_advertisment(self, event, payer, budget):
