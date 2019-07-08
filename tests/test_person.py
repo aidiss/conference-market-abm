@@ -81,4 +81,4 @@ class TestAssessSeenFacebookEvents(unittest.TestCase):
     def test_person_browse_facebook(self):
         self.person.browse_facebook()
         self.person.assess_seen_events()
-        self.assertEqual(self.person.tickets, [])
+        self.assertEqual(len(self.person.tickets), 1)
