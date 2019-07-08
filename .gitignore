@@ -8,3 +8,5 @@ __pycache__/
 .noseids
 log.log
 settings.json
+.mypy_cache/
+.vscode/
