@@ -5,7 +5,8 @@ fake = Faker()
 
 
 class ConferenceProvider(BaseProvider):
-    conferences = ["one", "two", "three"]
+    conferences = ["PyConLT", "Agile Tour", "TestCon",
+                   'PyData', 'DevopsPro', 'ESET Security Days']
 
     def conference(self):
         return dict(
@@ -26,7 +27,7 @@ class ConferenceProvider(BaseProvider):
         return fake.date()
 
     def end_date(self):
-        return self.start_date() + 1
+        return fake.date()
 
     def price(self):
         return self.random_int(30, 200)
