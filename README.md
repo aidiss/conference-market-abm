@@ -23,3 +23,23 @@ Available scenarios:
 
 - 2018
 - 2019
+
+Events for consideration:
+
+Person.BuyConferenceTicket
+Person.BrowseFacebook
+Person.BrowseTwitter
+Person.AssessConference
+
+Conference.PublishTicket
+Conference.OrderFacebookAdvertisment
+Conference.OrderGoogleAdvertisment
+
+Facebook.AdvertiseEvent
+
+Google.AdvertiseEvent
+
+Company.PostJobListing
+Company.HireEmployee
+Company.FireEmployee
+Company.PayEmployeeSalary
