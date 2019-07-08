@@ -3,6 +3,8 @@ from conference_market.agents import Person
 from conference_market.model import ConferenceModel, Conference
 
 from conference_market.agents import JobPostingSite
+from conference_market.agents import Facebook
+
 import datetime
 
 
@@ -47,9 +49,6 @@ class TestPersonBrowseJobAdds(unittest.TestCase):
 
     def test_person_browse_job_adds(self):
         self.person.browse_job_postings(self.job_posting_site)
-
-
-from conference_market.agents import Facebook
 
 
 class TestPersonBrowseFacebook(unittest.TestCase):
