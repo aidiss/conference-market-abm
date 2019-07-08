@@ -13,7 +13,7 @@ class ConferenceProvider(BaseProvider):
             name=self.random_element(self.conferences),
             wealth=self.wealth(),
             start_date=self.start_date(),
-            end_date=self.start_date(),
+            end_date=self.end_date(),
             price=self.price(),
             visibility=self.visibility(),
             topics=[self.topic() for _ in range(10)],
@@ -24,7 +24,7 @@ class ConferenceProvider(BaseProvider):
         return self.random_digit()
 
     def start_date(self):
-        return fake.date()
+        return fake.date_between(start_date="-30y", end_date="today")
 
     def end_date(self):
         return fake.date()

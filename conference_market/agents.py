@@ -13,7 +13,7 @@ from facebook import FacebookEvent
 from conference_market.faker_provider import fake
 import logging
 
-REPORTING = False
+REPORTING = True
 
 
 techs = load_techs()
@@ -84,6 +84,8 @@ class Conference:
         self.city = city
         self.tickets = []
 
+        self.event_posted = False
+
     @classmethod
     def from_faker_conference(cls, unique_id, model, **kwargs):
         """Generates a conference from fake data"""
@@ -115,8 +117,7 @@ class Conference:
 
     def publish_event(self):
         """Publish event. I guess on website"""
-        if not self.published_events:
-            pass
+        self.model.facebook.create_event('name', 'host', conference=self)
 
     def publish_tickets(self):
         # Need publish date
@@ -130,6 +131,8 @@ class Conference:
         # Advertise
         self.select_date()
         self.publish_cfp()
+        if not self.event_posted:
+            self.publish_event()
         # self.advertise()
         # self.publish_tickets()
         if REPORTING:
@@ -205,9 +208,15 @@ class Person(Agent):
 
     def assess_seen_events(self):
         # Did person see the conference
-        for event in self.events_seen:
-            conference = event.conference
-            self.buy_conference_ticket(conference)
+        if self.events_seen:
+            random_choice = choice(self.events_seen).conference
+            days_till_event = random_choice.start_date - self.model.date
+            if days_till_event.days <= 0:
+                return
+
+            buy_chance = 1 / days_till_event.days
+            if random() < buy_chance:
+                self.buy_conference_ticket(random_choice)
 
     def check_for_conferences(self):
         """Looks through all conferences. Calls `consider_buyingticket`"""
@@ -257,9 +266,6 @@ class Person(Agent):
 
     def look_for_job(self):
         """Look for a job"""
-        if self.is_employed:
-            return
-
         interesting_jobs = []  # todo: look for job in market
         if interesting_jobs:
             self.job = interesting_jobs[0]
@@ -268,17 +274,7 @@ class Person(Agent):
     def collect_monthly_wage(self):
         """Collects monthly wage
 
-        Todo: wage should be transfered to bank by employee
-        Company, employee, account."""
-
-        # Not employed, cannnot collect
-        if not self.is_employed:
-            return
-
-        # Not a day I get paid.
-        if self.model.date.day != 10:
-            return
-
+        Todo: wage should be transfered to bank by employee"""
         amount = self.monthly_income
 
         self.wealth += amount
@@ -288,8 +284,6 @@ class Person(Agent):
         self.wealth -= expenses
 
     def pay_taxes(self):
-        if self.model.date.day != 1:
-            return
         taxes = self.monthly_taxes
         self.wealth -= taxes
 
@@ -326,18 +320,35 @@ class Person(Agent):
 
         # You need this to survive. You will spend some money on it.
         self.buy_food()
+
         # Work and get paid. Likely, you work for some particular company.
-        self.work()
+        if self.is_employed:
+            self.work()
+
         # You did well, here is your money transfer.
-        self.collect_monthly_wage()
+        if self.is_employed and (self.model.date.day == 10):
+            self.collect_monthly_wage()
+
         # No job, or your current one does not satisfy you? Look for another one.
-        self.look_for_job()
+        if not self.is_employed:
+            self.look_for_job()
+
         # You need to pay taxes, all of them.
-        self.pay_taxes()
+        if self.model.date.day == 1:
+            self.pay_taxes()
+
         # You need to check facebook
-        self.browse_facebook()
+        if not self.tickets:
+            self.browse_facebook()
+
+        # You need to check facebook
+        if not self.tickets:
+            self.assess_seen_events()
+
         # Here is outlier.
-        self.check_for_conferences()
+        if not self.tickets:
+            self.check_for_conferences()
+
         # you have a ticket, why not attending?
         self.attend_event()
 
