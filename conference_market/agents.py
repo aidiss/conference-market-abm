@@ -6,7 +6,7 @@ import numpy as np
 
 from fuzzywuzzy.fuzz import partial_token_set_ratio, ratio, token_set_ratio
 from mesa import Agent, Model
-from conference_market.models import JobPosting, FacebookEventAdvertisment
+from conference_market.models import JobPosting, FacebookEventAdvertisment, Ticket
 from conference_market.utils import load_stackshare_techs, load_techs
 from facebook import FacebookEvent
 
@@ -82,7 +82,7 @@ class Conference:
         self.wealth: float = wealth or 500
         self.ticket_sold_count = 0
         self.city = city
-        self.tickets = []
+        self.tickets: List[Ticket] = []
 
         self.event_posted = False
 
@@ -106,24 +106,9 @@ class Conference:
         # Check what is the preference?
         pass
 
-    def advertise_facebook(self):
-        """Advertise"""
-
-        r = 0.01  # growth rate / tick
-        K = 1  # carrying capacity
-        x = self.visibility
-        x = x + r * x * (1 - x / K)
-        self.visibility = x
-
     def publish_event(self):
         """Publish event. I guess on website"""
         self.model.facebook.create_event('name', 'host', conference=self)
-
-    def publish_tickets(self):
-        # Need publish date
-        if not self.published_tickets:
-            for ticket in self.tickets:
-                ticket.published = True
 
     def step(self):
         """Steps are made day"""
@@ -133,8 +118,7 @@ class Conference:
         self.publish_cfp()
         if not self.event_posted:
             self.publish_event()
-        # self.advertise()
-        # self.publish_tickets()
+
         if REPORTING:
             self.dump_report()
 
@@ -173,139 +157,36 @@ class Person(Agent):
         return cls(unique_id, model)
         # return cls(unique_id, model, **fake.profile())
 
-    def assess_conference_topic(self, conference):
-        import Levenshtein
-        interests = self.interests
-        description = conference.description
-
-        if isinstance(interests, list):
-            interests = '. '.join(interests)
-        if isinstance(description, list):
-            description = '. '.join(description)
-
-        distance = Levenshtein.distance(interests, description)
-
-        return distance
-
-    def assess_conference(self, conference):
-        # Did person see the conference
-        if conference.visibility < self.awareness:
-            return
-
-        # Do not consider buying second ticket.
-        if conference.name in self.tickets:
-            return
-
-        # Cant consider too expensive conferences
-        if conference.price > self.wealth:
-            return
-
-        # todo: move elsewhere
-        if conference.start_date < self.model.date:
-            return
-
-        return True
-
     def assess_seen_events(self):
-        # Did person see the conference
-        if self.events_seen:
-            random_choice = choice(self.events_seen).conference
-            days_till_event = random_choice.start_date - self.model.date
-            if days_till_event.days <= 0:
-                return
-
-            buy_chance = 1 / days_till_event.days
-            if random() < buy_chance:
-                self.buy_conference_ticket(random_choice)
-
-    def check_for_conferences(self):
-        """Looks through all conferences. Calls `consider_buyingticket`"""
-
-        if self.tickets:
-            # We have tickets already no need to check
+        """Go through seen events"""
+        random_choice = choice(self.events_seen).conference
+        days_till_event = random_choice.start_date - self.model.date
+        # Will not be buying a ticket to event which is already over.
+        if days_till_event.days <= 0:
             return
 
-        for conference in self.model.conferences:
-            if not self.assess_conference(conference):
-                continue
+        buy_chance = 1 / (days_till_event.days ** 1.5)
 
-            # Calculate distance penalty
-            if conference.city == self.city:
-                distance_penalty = 0
-            else:
-                distance = self.model.location_map[(
-                    self.city, conference.city)]
-                distance_penalty = distance
-
-            interest = self.calculate_interest_in_conference(conference)
-            self.consider_buying_a_ticket(
-                conference, interest, distance_penalty)
-
-    def calculate_interest_in_conference(self, conference):
-        """Calculates interest in conference based on how much topics fit"""
-
-        # Very slow. Todo: need to replace with faster approach
-        interest = self.interest_matching_mode(
-            conference.topics, self.interests)
-
-        if REPORTING:
-            self._report_interest(interest)
-        return interest
-
-    def consider_buying_a_ticket(self, conference, interest: int, distance_penalty: float):
-        interest -= distance_penalty / 10
-        if interest < 45:
-            return
-
-        self.buy_conference_ticket(conference)
-
-    def work(self):
-        """Work requires certain skill, there are other people working there too."""
-        if not self.is_employed:
-            return
-
-    def look_for_job(self):
-        """Look for a job"""
-        interesting_jobs = []  # todo: look for job in market
-        if interesting_jobs:
-            self.job = interesting_jobs[0]
-            self.is_employed = True
-
-    def collect_monthly_wage(self):
-        """Collects monthly wage
-
-        Todo: wage should be transfered to bank by employee"""
-        amount = self.monthly_income
-
-        self.wealth += amount
-
-    def buy_food(self):
-        expenses = self.daily_food_expenses
-        self.wealth -= expenses
-
-    def pay_taxes(self):
-        taxes = self.monthly_taxes
-        self.wealth -= taxes
+        if random() < buy_chance:
+            self.buy_conference_ticket(random_choice)
 
     def attend_event(self):
-        # If event is today, attend.
-        # What will happen?
-        pass
+        """Attend event
+
+        Knowledge and relationships should change"""
+
+        self.tickets = []
 
     def buy_conference_ticket(self, conference):
-        logging.debug("Person with interests %s is buying a ticket to %s", ','.join(
-            self.interests), conference.name)
+        """Buy a conference ticket buy transfering money"""
+        log_msg = "Person with interests %s is buying a ticket to %s"
+        logging.debug(log_msg, ','.join(self.interests), conference.name)
         self.wealth -= conference.price
         conference.wealth += conference.price
-        self.tickets.append(conference.name)
+        self.tickets.append(conference)
         conference.ticket_sold_count += 1
         if REPORTING:
             self._report_purchase(conference)
-
-    def browse_job_postings(self, job_posting_site: JobPostingSite):
-        """By browsing a site you increase your interest in certain technologies"""
-        for job_posting in job_posting_site.job_postings:
-            job_posting.description
 
     def browse_facebook(self):
         """Browse facebook"""
@@ -318,39 +199,18 @@ class Person(Agent):
         A person does a lot of stuff in a daily routine. He or she wakes up, showers, eats breakfast,
         commutes to work"""
 
-        # You need this to survive. You will spend some money on it.
-        self.buy_food()
-
-        # Work and get paid. Likely, you work for some particular company.
-        if self.is_employed:
-            self.work()
-
-        # You did well, here is your money transfer.
-        if self.is_employed and (self.model.date.day == 10):
-            self.collect_monthly_wage()
-
-        # No job, or your current one does not satisfy you? Look for another one.
-        if not self.is_employed:
-            self.look_for_job()
-
-        # You need to pay taxes, all of them.
-        if self.model.date.day == 1:
-            self.pay_taxes()
-
         # You need to check facebook
         if not self.tickets:
             self.browse_facebook()
 
         # You need to check facebook
-        if not self.tickets:
+        if not self.tickets and self.events_seen:
             self.assess_seen_events()
 
-        # Here is outlier.
-        if not self.tickets:
-            self.check_for_conferences()
-
         # you have a ticket, why not attending?
-        self.attend_event()
+        if self.tickets:
+            if self.model.date in [t.start_date for t in self.tickets]:
+                self.attend_event()
 
     def _report_interest(self, interest):
         self.model.datacollector.add_table_row(
