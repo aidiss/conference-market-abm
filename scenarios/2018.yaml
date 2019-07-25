@@ -1,6 +1,6 @@
 version: 1
 start_date: 2018-02-01
-end_date: 2019-05-01
+end_date: 2019-06-01
 agents:
   persons:
     count: 300
@@ -15,14 +15,24 @@ agents:
       visibility: 0.3
       city: kaunas
 
-    - name: 'PyConLT 2019'
-      start_date: 2019-05-25
-      end_date: 2019-05-25
-      price: 0
-      topics: [python, django, sklearn, keras, natural language processing, asyncio, gensim]
+    - name: 'DevDays Vilnius'
+      start_date: 2018-05-22
+      end_date: 2018-05-24
+      price: 200
+      topics: [programming languages, architecture and design, IoT, applied data science, agile and leadership, functional programming, machine learning, web and UX, bigdata and analytics, databases and warehouse, etc.] 
       wealth: 1000
       visibility: 0.3
-      city: kaunas
+      city: vilnius
+
+    - name: 'TestCon 2018'
+      start_date: 2018-10-16
+      end_date: 2018-10-18
+      price: 10
+      topics: [Test Management, Testing Techniques and Methodologies, Test Automation, Performance Testing, Testing the Internet of Things (IoT), Testing Metrics, Agile Testing, Test Team Leadership and Soft Skills.]
+      wealth: 1000
+      visibility: 0.3
+      city: vilnius
+
 
 
     - name: 'DevOpsPro Vilnius'
@@ -39,21 +49,12 @@ agents:
       visibility: 0.4
       city: vilnius
 
-
-    - name: 'TestCon'
-      start_date: 2018-10-16
-      end_date: 2018-10-18
-      price: 10
-      topics: [Test Management, Testing Techniques and Methodologies, Test Automation, Performance Testing, Testing the Internet of Things (IoT), Testing Metrics, Agile Testing, Test Team Leadership and Soft Skills.]
+    - name: 'PyConLT 2019'
+      start_date: 2019-05-25
+      end_date: 2019-05-25
+      price: 0
+      topics: [python, django, sklearn, keras, natural language processing, asyncio, gensim]
       wealth: 1000
       visibility: 0.3
-      city: vilnius
+      city: kaunas
 
-    - name: 'DevDays Vilnius'
-      start_date: 2018-05-22
-      end_date: 2018-05-24
-      price: 200
-      topics: [programming languages, architecture and design, IoT, applied data science, agile and leadership, functional programming, machine learning, web and UX, bigdata and analytics, databases and warehouse, etc.] 
-      wealth: 1000
-      visibility: 0.3
-      city: vilnius

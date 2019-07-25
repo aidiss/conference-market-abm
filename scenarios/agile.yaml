@@ -1,0 +1,26 @@
+    - name: 'Agile Tour Vilnius 2018'
+      start_date: 2018-10-25
+      end_date: 2018-10-25
+      price: 10
+      topics: ["project management"]
+      wealth: 1000
+      visibility: 0.3
+      city: vilnius
+
+    - name: 'Agile Tour Kaunas 2018'
+      start_date: 2018-10-18
+      end_date: 2018-10-18
+      price: 10
+      topics: ["project management"]
+      wealth: 1000
+      visibility: 0.3
+      city: kaunas
+    
+    - name: 'Agile Tour Vilnius 2019'
+      start_date: 2019-10-24
+      end_date: 2019-10-24
+      price: 0
+      topics: [agile tour]
+      wealth: 1000
+      visibility: 0.3
+      city: vilnius
