@@ -13,7 +13,7 @@ from facebook import FacebookEvent
 from conference_market.faker_provider import fake
 import logging
 
-REPORTING = True
+REPORTING = False
 
 
 techs = load_techs()

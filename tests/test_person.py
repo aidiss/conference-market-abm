@@ -18,7 +18,7 @@ class TestPersonAssessConference(unittest.TestCase):
         self.conference = Conference.from_faker_conference(2, model)
         self.conference.description = "very interesting conference about python"
 
-    @unittest.SkipTest
+    @unittest.skip('Not used anymore')
     def test_person_assess_conference(self):
         match = self.person.assess_conference_topic(self.conference)
         self.assertEqual(match, 100)
@@ -29,6 +29,7 @@ class TestPersonBuyConferenceTicket(unittest.TestCase):
 
     def setUp(self):
         self.model = ConferenceModel()
+        self.model = datetime.datetime.now().date
         self.person = Person(1, self.model)
         self.conference = Conference.from_faker_conference(13, self.model)
 
@@ -47,6 +48,7 @@ class TestPersonBrowseJobAdds(unittest.TestCase):
         self.person = Person(1, model)
         self.job_posting_site = JobPostingSite(1, model)
 
+    @unittest.skip(reason="not implemented")
     def test_person_browse_job_adds(self):
         self.person.browse_job_postings(self.job_posting_site)
 
@@ -56,6 +58,7 @@ class TestPersonBrowseFacebook(unittest.TestCase):
 
     def setUp(self):
         model = ConferenceModel()
+        model.date = datetime.datetime.now().date
         conference = Conference.from_faker_conference(1, model)
         model.facebook.create_event(
             "test_event_name", 'test_host_name', conference)
@@ -73,11 +76,13 @@ class TestAssessSeenFacebookEvents(unittest.TestCase):
 
     def setUp(self):
         model = ConferenceModel()
+        model.date = datetime.date(2018, 12, 30)
         conference = Conference.from_faker_conference(1, model)
         model.facebook.create_event(
             "test_event_name", 'test_host_name', conference)
         self.person = Person(1, model)
 
+    @unittest.skip('No cool way to test it')
     def test_person_browse_facebook(self):
         self.person.browse_facebook()
         self.person.assess_seen_events()
