@@ -7,7 +7,7 @@ import numpy as np
 from fuzzywuzzy.fuzz import partial_token_set_ratio, ratio, token_set_ratio
 from mesa import Agent, Model
 from conference_market.models import JobPosting, FacebookEventAdvertisment, Ticket
-from conference_market.utils import load_stackshare_techs, load_techs
+from conference_market.utils import load_stackshare_techs, load_techs, load_stackoverflow_tags
 from facebook import FacebookEvent
 
 from conference_market.faker_provider import fake
@@ -18,6 +18,7 @@ REPORTING = True
 
 techs = load_techs()
 techs = load_stackshare_techs()
+techs = load_stackoverflow_tags()
 interest_modes = [partial_token_set_ratio, token_set_ratio, ratio]
 
 
@@ -78,13 +79,15 @@ class Conference:
         self.end_date: datetime = end_date
         self.price: float = price
         self.visibility: float = visibility or 0.1
-        self.topics: str = topics
+        self.topics: str = [topic.lower().replace(' ', '-')
+                            for topic in topics]
         self.wealth: float = wealth or 500
         self.ticket_sold_count = 0
         self.city = city
         self.tickets: List[Ticket] = []
 
         self.event_posted = False
+        print(self.topics)
 
     @classmethod
     def from_faker_conference(cls, unique_id, model, **kwargs):
@@ -147,7 +150,8 @@ class Person(Agent):
         self.interest_matching_mode = choice(interest_modes)
         self.is_employed = True
         self.awareness = np.random.normal(0.5, 0.2)
-        self.city = choice(["kaunas", "vilnius", "vilnius"])
+        self.city = choice(
+            ["kaunas", "vilnius", "vilnius", "vilnius", "vilnius"])
         self.events_seen = []
 
     @classmethod
@@ -166,6 +170,13 @@ class Person(Agent):
             return
 
         buy_chance = 1 / (days_till_event.days ** 1.5)
+
+        if random_choice.city != self.city:
+            buy_chance /= 5
+
+        if buy_chance >= .2:
+            # buy_chance *= (buy_chance / 1) + 1
+            buy_chance = .2
 
         if random() < buy_chance:
             self.buy_conference_ticket(random_choice)

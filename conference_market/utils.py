@@ -5,6 +5,13 @@ import time
 import logging
 
 
+def load_stackoverflow_tags(limit=100):
+    with open("conference_market/data/stackoverflow-dump.csv") as f:
+        # data = [(tech, int(votes)) for tech, votes in csv.reader(f)]
+        data = [tech for tech, votes in csv.reader(f)][:limit]
+    return data
+
+
 def load_techs():
     with open("conference_market/data/techs.txt") as f:
         techs = f.read().split("\n")
